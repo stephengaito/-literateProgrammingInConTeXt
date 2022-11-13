@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# This bash script uses the current working directory to create a simple
+# script to run the lpc command anywhere in a user's workspace.
+
+cmdScript=$(pwd)/.venv/bin/lpc
+
+cat << CMD_SCRIPT > $HOME/.local/bin/lpc
+#!/bin/sh
+
+# This shell script was created by the ConTeXt2ninja tool
+#       './scripts/installEditableLpcCommand'
+# script.
+
+exec $cmdScript \$@
+CMD_SCRIPT
+
+chmod a+x $HOME/.local/bin/lpc
+
+echo ""
+echo "Editable lpc command has been created"
+echo ""
