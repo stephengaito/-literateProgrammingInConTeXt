@@ -1,12 +1,12 @@
 
-import lpc.dsl
+import lpic.dsl
 
 def dealWithComponent(anReMatch) :
   if not anReMatch : return
   subContextPath = anReMatch.group(1)
-  lpc.dsl.parse(subContextPath+'.tex')
+  lpic.dsl.parse(subContextPath+'.tex')
 
-lpc.dsl.registerMacro(
+lpic.dsl.registerMacro(
   'component',
   '\\\\component\s+(\S+)\s*',
   dealWithComponent

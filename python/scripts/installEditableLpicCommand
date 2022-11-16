@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# This bash script uses the current working directory to create a simple
+# script to run the lpic command anywhere in a user's workspace.
+
+cmdScript=$(pwd)/.venv/bin/lpic
+
+cat << CMD_SCRIPT > $HOME/.local/bin/lpic
+#!/bin/sh
+
+# This shell script was created by the ConTeXt2ninja tool
+#       './scripts/installEditableLpicCommand'
+# script.
+
+exec $cmdScript \$@
+CMD_SCRIPT
+
+chmod a+x $HOME/.local/bin/lpic
+
+echo ""
+echo "Editable lpic command has been created"
+echo ""

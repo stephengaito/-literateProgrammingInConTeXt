@@ -1,4 +1,4 @@
 
-import lpc.dsl
+import lpic.dsl
 
 # we currently do nothing

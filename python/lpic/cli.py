@@ -2,19 +2,19 @@ import re
 import sys
 import aiofiles
 
-from lpc.dsl import parse
+from lpic.dsl import parse
 
-import lpc.macros.baseContext
-import lpc.macros.litterateProgramming
+import lpic.macros.baseContext
+import lpic.macros.litterateProgramming
 
-lpc.dsl.showMacros()
+lpic.dsl.showMacros()
 
 def usage() :
   print("""
-lpc processes a context file looking for significant control macros to
+lpic processes a context file looking for significant control macros to
 build a map of how to build the document and its associated software.
 
-usage: lpc [options] <contextFile>
+usage: lpic [options] <contextFile>
 
 contextFile the path to the conTeXt file to be processed.
 
