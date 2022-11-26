@@ -1,4 +1,4 @@
 
-import lpic.dsl
+import lpic.parser
 
 # we currently do nothing

@@ -2,12 +2,15 @@ import re
 import sys
 import aiofiles
 
-from lpic.dsl import parse
+# The next two modules are used by the macros...
+import lpic.ninja
+import lpic.parser
+from lpic.parser import pState
 
 import lpic.macros.baseContext
 import lpic.macros.litterateProgramming
 
-lpic.dsl.showMacros()
+lpic.parser.showMacros()
 
 def usage() :
   print("""
@@ -34,4 +37,11 @@ def cli() :
     usage()
 
   contextPath = sys.argv.pop(0)
-  parse(contextPath)
+
+  contextPath = lpic.macros.baseContext.addTex(contextPath)
+
+  lpic.ninja.addBuild(contextPath, 'context')
+  pState.curArtefact =  contextPath
+  lpic.macros.baseContext.dealWithComponent(contextPath)
+
+  lpic.ninja.writeOutNinjaFile(sys.stdout)

@@ -1,6 +1,9 @@
+Unless specified differently in a source file's header, all files are
+licensed using the:
+
 MIT License
 
-Copyright (c) 2022 stephengaito
+Copyright (c) 2022 PerceptiSys Ltd (Stephen Gaito)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -19,3 +22,8 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+----------------------------------------------------------------------------
+
+The `python/lpic/ninja_syntax.py` is licensed using the original Apache
+v2.0 license.
