@@ -5,7 +5,6 @@ import aiofiles
 # The next two modules are used by the macros...
 import lpic.ninja
 import lpic.parser
-from lpic.parser import pState
 
 import lpic.macros.baseContext
 import lpic.macros.litterateProgramming
