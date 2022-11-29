@@ -6,7 +6,6 @@ import yaml
 #########################################################################
 # state
 
-
 class ParserState :
   def __init__(self) :
     super().__setattr__('state', {})
@@ -30,37 +29,36 @@ class ParserState :
     print(yaml.dump(self.stack))
     print("---------------------------")
 
-  def pushState(self, keepState=False) :
+  def pushState(self, keepState=True) :
     self.stack.append(self.state)
-    if keepState : super().__setattr__('state', self.state.deepcopy())
+    if keepState : super().__setattr__('state', copy.deepcopy(self.state))
     else :         super().__setattr__('state', {})
 
   def popState(self) :
     if 0 < len(self.stack) : super().__setattr__('state', self.stack.pop())
     else                   : super().__setattr__('state', {})
 
-pState = ParserState()
-
 class Parser :
+
+  state = ParserState()
 
   #########################################################################
   # macros specific class variables and methods
 
   macros = {}
 
-  def registerMacro(macroProbe, macroRE, macroAction) :
+  @classmethod
+  def registerMacro(cls, macroProbe, macroAction) :
     if not macroProbe.startswith('\\') :
       macroProbe = '\\'+macroProbe
-    if macroProbe in macros :
+    if macroProbe in cls.macros :
       print(f"You can not register an existing macro {macroProbe}")
       return
-    macros[macroProbe] = {
-      're'     : re.compile(macroRE),
-      'action' : macroAction
-    }
+    cls.macros[macroProbe] = macroAction
 
-  def showMacros() :
-    print(yaml.dump(macros))
+  @classmethod
+  def showMacros(cls) :
+    print(yaml.dump(cls.macros))
 
   #########################################################################
   # parser specific class variables and methods
@@ -70,18 +68,28 @@ class Parser :
   #########################################################################
   # parser specific instance variables and methods
 
-  def __init__(contextPath) :
-    if '.' not in contextPath : contextPath = contextPath + '.text'
+  def __init__(self, contextPath) :
+    if contextPath.startswith('\\component') :
+      # create a fake Parser to hand to
+      # lpic.macros.baseContext.dealWithComponent to get everything
+      # started
+      print(f"New fake parser on [{contextPath}]")
+      self.curLine = contextPath
+    else :
+      if '.' not in contextPath : contextPath = contextPath + '.tex'
+      print(f"New parser on [{contextPath}]")
+      self.curLine     = None
+
     self.contextPath = contextPath
     self.contextFile = None
     self.linesIter   = None
     self.probesIter  = None
-    self.curLine     = None
 
   def __del__(self) :
     if self.contextFile is not None : self.contextFile.close()
 
   def removeComment(aLine) :
+    aLine = aLine.strip()
     parts = aLine.split('%')
     newLine = []
     while True :
@@ -93,9 +101,13 @@ class Parser :
 
   def __lineIter__(self) :
     if self.contextFile is None :
-      self.contextFile = open(self.contextPath, 'r')
+      try :
+        self.contextFile = open(self.contextPath, 'r')
+      except FileNotFoundError :
+        print(f"Could not open [{self.contextPath}]")
+        self.contextFile = []
     for aLine in self.contextFile :
-      self.curLine = Parser.removeComment(next(self.linesIter))
+      self.curLine = Parser.removeComment(aLine)
       yield self.curLine
     self.curLine = None
     yield self.curLine
@@ -105,39 +117,26 @@ class Parser :
       self.linesIter = self.__lineIter__()
     return next(self.linesIter, None)
 
+  def __probeIter__(self) :
+    if self.curLine is None : self.nextLine()
+    while self.curLine  is not None :
+      curProbes = type(self).macroRE.findall(self.curLine)
+      for aProbe in curProbes :
+        yield aProbe
+      self.nextLine()
+    yield None
+
   def nextProbe(self) :
     if self.probesIter is None :
-      if self.curLine is None : self.nextLine()
-      if self.curLine is None :
-        self.curProbe = None
-        return self.curProbe
-      self.probesIter = macroRE.finditer(self.curLine)
-    self.curProbe = next(self.probesIter, None)
-    return self.curProbe
+      self.probesIter = self.__probeIter__()
+    return next(self.probesIter, None)
 
-  def runNextMacro(self) :
+  def runMacros(self) :
     aProbe = self.nextProbe()
     while aProbe :
-      if aProbe in macros :
+      print(aProbe)
+      if aProbe in type(self).macros :
         index = self.curLine.find(aProbe)
-        macros[aProbe]['action'](self, index)
+        print(f"Found {aProbe} at {index} in [{self.curLine}]")
+        type(self).macros[aProbe](self, index)
       aProbe = self.nextProbe()
-
-  def parse(contextPath) :
-    print(f"opening {contextPath}")
-    try :
-      if not contextPath.endswith('.tex') : contextPath = contextPath+'.tex'
-      with open(contextPath, 'r') as contextFile :
-        for aLine in contextFile :
-          aLine = aLine.strip()
-          aLine = removeComment(aLine)
-          probes = macroRE.findall(aLine)
-          for aProbe in probes :
-            print(aProbe)
-            if aProbe in macros :
-              index = aLine.find(aProbe)
-              print(f"Found {aProbe} at {index} in [{aLine}]")
-              anReMatch = macros[aProbe]['re'].match(aLine, index)
-              macros[aProbe]['action'](anReMatch)
-    except FileNotFoundError :
-      pass # we quitely ignore this error since ConTeXt does as well!

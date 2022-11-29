@@ -1,30 +1,47 @@
 
+import os
 import re
 import yaml
 
 import lpic.ninja
 import lpic.parser
 
-def addTex(contextPath) :
-  if '.' not in contextPath : contextPath = contextPath + '.tex'
-  return contextPath
+import lpicBuildRules.context
 
-def dealWithComponent(anReMatch) :
-  if isinstance(anReMatch, str) :
-    subContextPath = anReMatch
-  elif isinstance(anReMatch, re.Match) :
-    subContextPath = anReMatch.group(1)
-  else : return
+#def addTex(contextPath) :
+#  if '.' not in contextPath : contextPath = contextPath + '.tex'
+#  return contextPath
 
-  subContextPath = addTex(subContextPath)
-  lpic.parser.pState.artefact = subContextPath
-  lpic.parser.pState.pushState(keepState=False)
-  lpic.ninja.addBuild(subContextPath, 'context')
-  lpic.parser.parse(subContextPath)
-  lpic.parser.pState.popState()
+componentRE = re.compile('\\\\component\s+(\S+)\s*')
 
-lpic.parser.registerMacro(
+def dealWithComponent(aParser, anIndex) :
+  # process this component...
+  #
+  anReMatch = componentRE.match(
+    aParser.curLine,
+    anIndex
+  )
+  pState  = lpic.parser.Parser.state
+  componentPath = anReMatch.group(1)
+  aParser = lpic.parser.Parser(componentPath)
+  if pState.curPdfBuilder :
+    curPdfBuilder = pState.curPdfBuilder
+    curPdfBuilder.addImplicitDep(aParser.contextPath)
+    pState.pushState()
+    if pState.prevBuilders is None :
+      lpic.ninja.Builds.addDefaultBuild(curPdfBuilder.buildName)
+      pState.prevBuilders = []
+    pState.prevBuilders.append(curPdfBuilder)
+
+  componentName = componentPath.removesuffix('.tex')
+  pdfBuildName = componentName+'.pdf'
+  pState.curPdfBuilder = lpic.ninja.Builds(pdfBuildName, pdfBuildName, 'context')
+  pState.curPdfBuilder.addExplicitDep(aParser.contextPath)
+  aParser.runMacros()
+
+  pState.popState()
+
+lpic.parser.Parser.registerMacro(
   'component',
-  '\\\\component\s+(\S+)\s*',
   dealWithComponent
 )

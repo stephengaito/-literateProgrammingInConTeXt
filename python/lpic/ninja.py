@@ -1,55 +1,145 @@
 
 import yaml
 
-nVars = {}
+class Vars :
 
-nRules = {}
+  nVars = {}
 
-nBuilds = {}
+  @classmethod
+  def hasVar(cls, aVarName) :
+    return aVarName in cls.nVars
 
-def getVars() :
-  return nVars
+  @classmethod
+  def addVar(cls, varName, varValue) :
+    if varName in cls.nVars :
+      print(f"Over writing existing variable: [{varName}]" )
+    cls.nVars[varName] = varValue
 
-def addVar(varName, varValue) :
-  if varName in nVars :
-    print(f"Over writing existing variable: [{varName}]" )
-  nVars[varName] = varValue
+  @classmethod
+  def writeOutVars(cls, aFileIO) :
+    sortedVars = sorted(list(cls.nVars.keys()))
+    aFileIO.write("######################################################\n")
+    aFileIO.write("# Global Variables\n\n")
+    for aVarName in sortedVars :
+      aFileIO.write(f"{aVarName} = {cls.nVars[aVarName]}\n\n")
+    aFileIO.write("\n")
 
-def getRules() :
-  return nRules
+class Rules :
+  def __init__(self) :
+    pass
 
-def addRule(ruleName, ruleCmd, ruleVars={}) :
-  if ruleName in nRules :
-    print(f"Over writing existing rule: [{ruleName}]")
-  ruleVars['command'] = ruleCmd
-  nRules[ruleName] = ruleVars
+class Rules :
 
-def getBuilds() :
-  return nBuilds
+  nRules = {}
 
-def addBuild(artefact, ruleName) :
-  if artefact in nBuilds :
-    print(f"Over writing existing build artefact [{artefact}]")
-  nBuilds[artefact] = {
-    'ruleName'     : ruleName,
-    'dependencies' : [],
-    'outputs'      : [ artefact ]
-  }
+  def __init__(self, aRuleName, aRuleCmd, someRuleVars = {}) :
+    if aRuleName in type(self).nRules :
+      print(f"Over writing existing rule: [{ruleName}]")
+    self.command = aRuleCmd
+    self.name    = aRuleName
+    self.rVars   = someRuleVars
+    type(self).nRules[aRuleName] = self
 
-def addDependency(artefact, dependency) :
-  if artefact not in nBuilds :
-    print(f"No existing build rule for [{artefact}]")
-    return
-  nBuilds[artefact]['dependencies'].append(dependency)
+  @classmethod
+  def hasRule(cls, aRuleName) :
+    return aRuleName in cls.nRules
+
+  def writeOutThisRule(self, aFileIO) :
+    aFileIO.write(f"rule {self.name}\n")
+    aFileIO.write(f"  command = {self.command}\n")
+    if self.rVars :
+      sortedVars = self.rVars.keys().sort()
+      for aVarName in sortedVars :
+        aFileIO.write(f"  {aVarName} = {self.rVars[aVarName]}\n")
+    aFileIO.write("\n")
+
+  @classmethod
+  def writeOutRules(cls, aFileIO) :
+    sortedRules = sorted(list(cls.nRules.keys()))
+    aFileIO.write("######################################################\n")
+    aFileIO.write("# Rules\n\n")
+    for aRuleName in sortedRules :
+      cls.nRules[aRuleName].writeOutThisRule(aFileIO)
+    aFileIO.write("\n")
+
+class Builds :
+
+  nBuilds = {}
+
+  nDefaults = []
+
+  def __init__(self, aBuildName, anOutput, aRuleName) :
+    if aBuildName in type(self).nBuilds :
+      print(f"Over writing existing build artefact [{artefact}]")
+    self.implicitDeps    = {}
+    self.explicitDeps    = {}
+    self.ruleName        = aRuleName
+    self.explicitOutputs = { anOutput : True }
+    self.implicitOutputs = {}
+    self.bVars           = {}
+    self.buildName       = aBuildName
+
+    type(self).nBuilds[aBuildName] = self
+
+  def addImplicitDep(self, aDep) :
+    self.implicitDeps[aDep] = True
+
+  def addExplicitDep(self, aDep) :
+    self.explicitDeps[aDep] = True
+
+  def addVar(self, varName, varValue) :
+    if varName in self.bVars :
+      print(f"Over writing existing build var [{varName}]")
+    self.bVars[varName] = varValue
+
+  @classmethod
+  def addDefaultBuild(cls, aBuildName) :
+    if aBuildName not in cls.nDefaults :
+      cls.nDefaults.append(aBuildName)
+
+  @classmethod
+  def hasBuild(cls, aBuildName) :
+    return aBuildName in cls.nBuilds
+
+  def writeOutThisBuild(self, aFileIO) :
+    explicitOutputs = sorted(list(self.explicitOutputs.keys()))
+    implicitOutputs = sorted(list(self.implicitOutputs.keys()))
+    explicitDeps    = sorted(list(self.explicitDeps.keys()))
+    implicitDeps    = sorted(list(self.implicitDeps.keys()))
+    sortedVars      = sorted(list(self.bVars.keys()))
+    if not explicitOutputs : return
+    aFileIO.write(f"build {' '.join(explicitOutputs)} ")
+    if implicitOutputs :
+      aFileIO.write(f" | {' '.join(implicitOutputs)}")
+    aFileIO.write(f": {self.ruleName} ")
+    if explicitDeps :
+      aFileIO.write(" ".join(explicitDeps))
+    if implicitDeps :
+      aFileIO.write(f" | {' '.join(implicitDeps)}")
+    aFileIO.write("\n")
+    if sortedVars :
+      for aVarName in sortedVars :
+        aFileIO.write(f"  {aVarName} = {self.bVars[aVarName]}\n")
+    aFileIO.write("\n")
+
+  @classmethod
+  def writeOutBuilds(cls, aFileIO) :
+    sortedBuilds = sorted(list(cls.nBuilds.keys()))
+    aFileIO.write("######################################################\n")
+    aFileIO.write("# Builds\n\n")
+    for aBuildName in sortedBuilds :
+      cls.nBuilds[aBuildName].writeOutThisBuild(aFileIO)
+    if cls.nDefaults :
+      aFileIO.write(f"default {' '.join(cls.nDefaults)}\n\n")
+    aFileIO.write("\n")
 
 def writeOutNinjaFile(aFileIO) :
-  aFileIO.write("\n------------------------------------------------------\n")
-  aFileIO.write("ninja vars:\n")
-  aFileIO.write(yaml.dump(nVars))
-  aFileIO.write("\n------------------------------------------------------\n")
-  aFileIO.write("ninja rules:\n")
-  aFileIO.write(yaml.dump(nRules))
-  aFileIO.write("\n------------------------------------------------------\n")
-  aFileIO.write("ninja builds:\n")
-  aFileIO.write(yaml.dump(nBuilds))
-  aFileIO.write("\n------------------------------------------------------\n")
+  aFileIO.write("######################################################\n")
+  aFileIO.write("# This ninja.build file has been automatically\n")
+  aFileIO.write("# generated by the lpic command.\n")
+  aFileIO.write("# \n")
+  aFileIO.write("# DO NOT EDIT THIS FILE!\n")
+  aFileIO.write("# \n\n")
+  Vars.writeOutVars(aFileIO)
+  Rules.writeOutRules(aFileIO)
+  Builds.writeOutBuilds(aFileIO)

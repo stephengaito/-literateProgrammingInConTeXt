@@ -1,15 +1,32 @@
+import os
 import re
 import sys
-import aiofiles
+import yaml
+
+# Find the build rules (and base of pyComputeFarm directories)
+
+def findBuildRules() :
+  workingDir = os.getcwd().split(os.path.sep)
+  while 1 < len(workingDir) :
+    workingDir.pop()
+    lpicBuildRules = os.path.join(os.path.sep, *workingDir, 'lpicBuildRules')
+    if os.path.exists(lpicBuildRules) :
+      sys.path.append(os.path.join(os.path.sep, *workingDir))
+      return
+  print("Could not find the lpic build rules directory")
+  print("in any of the parent directories above:\n")
+  print(f"  {os.getcwd()}")
+  print("\nPlease provide your build rules and try again!")
+  sys.exit(1)
+
+findBuildRules()
 
 # The next two modules are used by the macros...
 import lpic.ninja
 import lpic.parser
 
 import lpic.macros.baseContext
-import lpic.macros.litterateProgramming
-
-lpic.parser.showMacros()
+#import lpic.macros.litterateProgramming
 
 def usage() :
   print("""
@@ -35,12 +52,12 @@ def cli() :
     print("No contextFile provided!")
     usage()
 
+
   contextPath = sys.argv.pop(0)
 
-  contextPath = lpic.macros.baseContext.addTex(contextPath)
+  baseParser = lpic.parser.Parser('\\component '+contextPath)
 
-  lpic.ninja.addBuild(contextPath, 'context')
-  pState.curArtefact =  contextPath
-  lpic.macros.baseContext.dealWithComponent(contextPath)
+  lpic.macros.baseContext.dealWithComponent(baseParser, 0)
 
-  lpic.ninja.writeOutNinjaFile(sys.stdout)
+  with open('build.ninja', 'w') as ninjaFile :
+    lpic.ninja.writeOutNinjaFile(ninjaFile)
