@@ -1,0 +1,99 @@
+%C Copyright 2022 PerceptiSys Ltd (Stephen Gaito)
+%C
+%C Permission is hereby granted, free of charge, to any person
+%C obtaining a copy of this software and associated documentation
+%C files (the "Software"), to deal in the Software without
+%C restriction, including without limitation the rights to use,
+%C copy, modify, merge, publish, distribute, sublicense, and/or sell
+%C copies of the Software, and to permit persons to whom the
+%C Software is furnished to do so, subject to the following
+%C conditions:
+%C
+%C    The above copyright notice and this permission notice shall
+%C    be included in all copies or substantial portions of the
+%C    Software.
+%C
+%C THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+%C EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+%C OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+%C NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+%C HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+%C WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+%C FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+%C OTHER DEALINGS IN THE SOFTWARE.
+
+%D \module
+%D   [     file=t-litprog,
+%D      version=2022.12.02,
+%D        title=\CONTEXT\ User module,
+%D     subtitle=Literate Programming in \ConTeXt,
+%D       author=Stephen Gaito,
+%D         date=\currentdate,
+%D    copyright=PerceptiSys Ltd (Stephen Gaito),
+%D        email=stephen@perceptisys.co.uk,
+%D      license=MIT License]
+
+% begin info
+%
+% title   : Literate Programming in ConTeXt
+% comment : Provides structured document and code generation
+% status  : under development, mkiv/mkxl only
+%
+% end info
+
+% see: https://bitbucket.org/philexander/context-highlight
+\usemodule[t-highlight-cpp]
+
+% see: https://wiki.contextgarden.net/TextBackground
+% see: https://www.contextgarden.net/Command/definetextbackground
+
+\definetextbackground%
+  [LitProgFrame]
+  [ location=paragraph, background=color, backgroundcolor=white,
+    leftoffset=.5\bodyfontsize, rightoffset=.5\bodyfontsize,
+    topoffset=.5\bodyfontsize,  bottomoffset=.5\bodyfontsize
+  ]
+
+% see: https://wiki.contextgarden.net/Verbatim_text
+
+\definetyping%
+  [MkIVCode]%
+  [ option=TEX, numbering=line, tab=2,
+    before={\noindent\startLitProgFrame}, after=\stopLitProgFrame
+  ]
+
+\definetyping%
+  [MpIVCode]%
+  [ option=MP, numbering=line, tab=2,
+    before={\noindent\startLitProgFrame}, after=\stopLitProgFrame
+  ]
+
+\definetyping%
+  [LuaCode]%
+  [option=LUA, numbering=line, tab=2,
+    before={\noindent\startLitProgFrame}, after=\stopLitProgFrame
+  ]
+
+\definetyping%
+  [LuaTemplate]%
+  [option=LUA, numbering=line, tab=2,
+    before={\noindent\startLitProgFrame}, after=\stopLitProgFrame
+  ]
+
+\definetyping%
+  [CHeader]%
+  [option=CPP, numbering=line, tab=2,
+    before={\noindent\startLitProgFrame}, after=\stopLitProgFrame
+  ]
+
+\definetyping%
+  [CCode]%
+  [option=CPP, numbering=line, tab=2,
+    before={\noindent\startLitProgFrame}, after=\stopLitProgFrame
+  ]
+
+\definetyping%
+  [Lmsfile]%
+  [option=LUA, numbering=line, tab=2,
+    before={\noindent\startLitProgFrame}, after=\stopLitProgFrame
+  ]
