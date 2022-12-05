@@ -26,7 +26,7 @@ import lpic.ninja
 import lpic.parser
 
 import lpic.macros.baseContext
-#import lpic.macros.litterateProgramming
+import lpic.macros.litterateProgramming
 
 def usage() :
   print("""

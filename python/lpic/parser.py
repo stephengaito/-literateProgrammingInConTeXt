@@ -86,7 +86,8 @@ class Parser :
     self.probesIter  = None
 
   def __del__(self) :
-    if self.contextFile is not None : self.contextFile.close()
+    if self.contextFile is not None and not isinstance(self.contextFile, list) :
+      self.contextFile.close()
 
   def removeComment(aLine) :
     aLine = aLine.strip()
@@ -107,7 +108,7 @@ class Parser :
         print(f"Could not open [{self.contextPath}]")
         self.contextFile = []
     for aLine in self.contextFile :
-      self.curLine = Parser.removeComment(aLine)
+      self.curLine = aLine.rstrip()
       yield self.curLine
     self.curLine = None
     yield self.curLine
@@ -120,7 +121,8 @@ class Parser :
   def __probeIter__(self) :
     if self.curLine is None : self.nextLine()
     while self.curLine  is not None :
-      curProbes = type(self).macroRE.findall(self.curLine)
+      curLine = Parser.removeComment(self.curLine)
+      curProbes = type(self).macroRE.findall(curLine)
       for aProbe in curProbes :
         yield aProbe
       self.nextLine()
