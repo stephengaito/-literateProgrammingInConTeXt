@@ -52,6 +52,11 @@ def cli() :
     print("No contextFile provided!")
     usage()
 
+  config = {}
+  with open('config.yaml') as configFile :
+    config = yaml.safe_load(configFile.read())
+
+  print(yaml.dump(config))
 
   contextPath = sys.argv.pop(0)
 
@@ -61,3 +66,5 @@ def cli() :
 
   with open('build.ninja', 'w') as ninjaFile :
     lpic.ninja.writeOutNinjaFile(ninjaFile)
+
+  lpic.parser.Parser.runFinalActions()

@@ -42,6 +42,17 @@ class Parser :
 
   state = ParserState()
 
+  finalActions = []
+
+  @classmethod
+  def registerFinalAction(cls, aFinalAction) :
+    cls.finalActions.append(aFinalAction)
+
+  @classmethod
+  def runFinalActions(cls) :
+    for anAction in cls.finalActions :
+      anAction()
+
   #########################################################################
   # macros specific class variables and methods
 
