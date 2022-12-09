@@ -43,6 +43,7 @@
 
 % see: https://bitbucket.org/philexander/context-highlight
 \usemodule[t-highlight-cpp]
+\registerctxluafile{t-litprog.lua}
 
 % see: https://wiki.contextgarden.net/TextBackground
 % see: https://www.contextgarden.net/Command/definetextbackground
@@ -91,6 +92,12 @@
   [option=CPP, numbering=line, tab=2,
     before={\noindent\startLitProgFrame}, after=\stopLitProgFrame
   ]
+
+\unexpanded\def\indexCCode#1{
+  \directlua{
+    thirddata.litProg.addCCodeIndex('#1')
+  }
+}
 
 \definetyping%
   [Lmsfile]%
