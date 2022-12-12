@@ -48,6 +48,8 @@
 % see: https://wiki.contextgarden.net/TextBackground
 % see: https://www.contextgarden.net/Command/definetextbackground
 
+\def\lpicDoubleArgRelax[#1][#2]{\relax}
+
 \definetextbackground%
   [LitProgFrame]
   [ location=paragraph, background=color, backgroundcolor=white,
@@ -81,11 +83,17 @@
     before={\noindent\startLitProgFrame}, after=\stopLitProgFrame
   ]
 
+\def\createsCHeader{\dodoubleempty\lpicDoubleArgRelax}
+
 \definetyping%
   [CHeader]%
   [option=CPP, numbering=line, tab=2,
     before={\noindent\startLitProgFrame}, after=\stopLitProgFrame
   ]
+
+\def\buildsCCodeLibrary{\dodoubleempty\lpicDoubleArgRelax}
+\def\buildsCCodeApplication{\dodoubleempty\lpicDoubleArgRelax}
+\def\createsCCode{\dodoubleempty\lpicDoubleArgRelax}
 
 \definetyping%
   [CCode]%
@@ -93,14 +101,14 @@
     before={\noindent\startLitProgFrame}, after=\stopLitProgFrame
   ]
 
-\unexpanded\def\indexCCode#1{
+\unexpanded\def\indexCCode[#1]{
   \directlua{
     thirddata.litProg.addCCodeIndex('#1')
   }
 }
 
-\definetyping%
-  [Lmsfile]%
-  [option=LUA, numbering=line, tab=2,
-    before={\noindent\startLitProgFrame}, after=\stopLitProgFrame
-  ]
+%\definetyping%
+%  [Lmsfile]%
+%  [option=LUA, numbering=line, tab=2,
+%    before={\noindent\startLitProgFrame}, after=\stopLitProgFrame
+%  ]
