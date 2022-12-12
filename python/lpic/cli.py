@@ -3,6 +3,9 @@ import re
 import sys
 import yaml
 
+#print(__file__.split(os.path.sep))
+#sys.exit(1)
+
 # Find the build rules (and base of pyComputeFarm directories)
 
 def findBuildRules() :
@@ -25,8 +28,11 @@ findBuildRules()
 import lpic.ninja
 import lpic.parser
 
+import lpicBuildRules.context
+import lpicBuildRules.cCode
+
 import lpic.macros.baseContext
-import lpic.macros.litterateProgramming
+import lpic.macros.literateProgramming
 
 def usage() :
   print("""
@@ -56,7 +62,8 @@ def cli() :
   with open('config.yaml') as configFile :
     config = yaml.safe_load(configFile.read())
 
-  print(yaml.dump(config))
+  lpicBuildRules.context.addBuildRules(config)
+  lpicBuildRules.cCode.addBuildRules(config)
 
   contextPath = sys.argv.pop(0)
 
@@ -67,4 +74,4 @@ def cli() :
   with open('build.ninja', 'w') as ninjaFile :
     lpic.ninja.writeOutNinjaFile(ninjaFile)
 
-  lpic.parser.Parser.runFinalActions()
+  lpic.parser.Parser.runFinalActions(config)

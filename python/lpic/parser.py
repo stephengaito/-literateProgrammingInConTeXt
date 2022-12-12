@@ -49,9 +49,9 @@ class Parser :
     cls.finalActions.append(aFinalAction)
 
   @classmethod
-  def runFinalActions(cls) :
+  def runFinalActions(cls, config) :
     for anAction in cls.finalActions :
-      anAction()
+      anAction(config)
 
   #########################################################################
   # macros specific class variables and methods

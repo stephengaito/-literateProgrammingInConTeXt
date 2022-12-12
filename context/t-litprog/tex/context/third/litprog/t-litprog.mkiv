@@ -48,7 +48,10 @@
 % see: https://wiki.contextgarden.net/TextBackground
 % see: https://www.contextgarden.net/Command/definetextbackground
 
+\def\lpicSingleArgRelax[#1]{\relax}
 \def\lpicDoubleArgRelax[#1][#2]{\relax}
+
+\def\copyrightOwner{\dosingleempty\lpicSingleArgRelax}
 
 \definetextbackground%
   [LitProgFrame]
@@ -83,7 +86,9 @@
     before={\noindent\startLitProgFrame}, after=\stopLitProgFrame
   ]
 
+\def\defaultCHeaderLicense{\dosingleempty\lpicSingleArgRelax}
 \def\createsCHeader{\dodoubleempty\lpicDoubleArgRelax}
+\def\addCHeaderLicense{\dodoubleempty\lpicDoubleArgRelax}
 
 \definetyping%
   [CHeader]%
@@ -91,9 +96,11 @@
     before={\noindent\startLitProgFrame}, after=\stopLitProgFrame
   ]
 
+\def\defaultCCodeLicense{\dosingleempty\lpicSingleArgRelax}
 \def\buildsCCodeLibrary{\dodoubleempty\lpicDoubleArgRelax}
 \def\buildsCCodeApplication{\dodoubleempty\lpicDoubleArgRelax}
 \def\createsCCode{\dodoubleempty\lpicDoubleArgRelax}
+\def\addCCodeLicense{\dodoubleempty\lpicDoubleArgRelax}
 
 \definetyping%
   [CCode]%

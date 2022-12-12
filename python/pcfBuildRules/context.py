@@ -4,7 +4,10 @@ import yaml
 
 from lpic.ninja import Vars, Rules, Builds
 
-def addContextVars() :
+contextDir = '.'
+
+def determineConTeXtDir() :
+  global contextDir
   if not Vars.hasVar('contextDir') :
     baseDir = __file__.split(os.path.sep)
     baseDir.pop()
@@ -12,13 +15,19 @@ def addContextVars() :
     baseDir = os.path.join(os.path.sep, *baseDir)
     cwdir = os.getcwd()
     contextDir = '.'+cwdir.removeprefix(baseDir)
+
+determineConTeXtDir()
+
+def addContextVars(config) :
     Vars.addVar('contextDir', contextDir)
 
-addContextVars()
-
-
-def addContextRules() :
+def addContextRules(config) :
   if not Rules.hasRule('context') :
-    Rules('context', 'newTask --dir $contextDir -- $out context $in')
+    Rules(
+      'context',
+      'newTask --dir $contextDir -- $out context $in'
+    )
 
-addContextRules()
+def addBuildRules(config) :
+  addContextVars(config)
+  addContextRules(config)
